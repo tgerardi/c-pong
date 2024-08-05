@@ -6,6 +6,8 @@
 #define BALL_SPEED 5.0f
 
 #include "raylib.h"
+#include "game_over_sound.h"
+#include "paddel_sound.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -24,10 +26,11 @@ typedef struct {
 
 char score1[20];
 char score2[20];
-Sound PaddelSound;
-Sound GameOver;
+Sound BounceSound;
+Sound GameOverSound;
 
 void InitGame(Paddle* player1, Paddle* player2, Ball* ball);
+Sound LoadSoundFromMemory(const unsigned char* data, int length);
 void UpdateGame(Paddle* player1, Paddle* player2, Ball* ball);
 void BallReset(Ball* ball);
 void DrawGame(Paddle* player1, Paddle* player2, Ball* ball);

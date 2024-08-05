@@ -20,6 +20,8 @@ int main(void)
         EndDrawing();
     }
 
+    UnloadSound(BounceSound);
+    UnloadSound(GameOverSound);
     CloseAudioDevice();
     CloseWindow();
 
@@ -52,8 +54,14 @@ void InitGame(Paddle* player1, Paddle* player2, Ball* ball)
     ball->speedY = BALL_SPEED;
 
     /* Sounds */
-    PaddelSound = LoadSound("sound/paddel-sound.wav");
-    GameOver = LoadSound("sound/game-over-sound.mp3");
+    BounceSound = LoadSoundFromMemory(paddel_sound_wav, paddel_sound_wav_len);
+    GameOverSound = LoadSoundFromMemory(game_over_sound_wav, game_over_sound_wav_len);
+}
+
+Sound LoadSoundFromMemory(const unsigned char* data, int length)
+{
+    Wave wave = LoadWaveFromMemory(".wav", data, length);
+    return LoadSoundFromWave(wave);
 }
 
 void UpdateGame(Paddle* player1, Paddle* player2, Ball* ball)
@@ -67,7 +75,7 @@ void UpdateGame(Paddle* player1, Paddle* player2, Ball* ball)
     /* Player 2 Movement */
     if (IsKeyDown(KEY_UP) && player2->y > 0)
         player2->y -= player1->speedY;
-    if (IsKeyDown(KEY_DOWN) && player1->y < SCREEN_HEIGHT - player2->height)
+    if (IsKeyDown(KEY_DOWN) && player2->y < SCREEN_HEIGHT - player2->height)
         player2->y += player1->speedY;
 
     /* Ball Movement */
@@ -75,8 +83,10 @@ void UpdateGame(Paddle* player1, Paddle* player2, Ball* ball)
     ball->y += ball->speedY;
 
     /* Ball Wall Collision */
-    if (ball->y < 0 || ball->y > SCREEN_HEIGHT)
+    if (ball->y < 0 || ball->y > SCREEN_HEIGHT) {
         ball->speedY *= -1;
+        PlaySound(BounceSound);
+    }
 
     /* Ball Paddel Collision */
     if (
@@ -84,18 +94,18 @@ void UpdateGame(Paddle* player1, Paddle* player2, Ball* ball)
         CheckCollisionCircleRec((Vector2){ball->x, ball->y}, ball->radius, (Rectangle){player2->x, player2->y, player2->width, player2->height})
     ) {
         ball->speedX *= -1;
-        PlaySound(PaddelSound);
+        PlaySound(BounceSound);
     }
 
     /* Ball Reset Position & Score Update */
     if (ball->x < 0) {
         ++player1->score;
         BallReset(ball);
-        PlaySound(GameOver);
+        PlaySound(GameOverSound);
     } else if (ball->x > SCREEN_WIDTH) {
         ++player2->score;
         BallReset(ball);
-        PlaySound(GameOver);
+        PlaySound(GameOverSound);
     }
 }
 
