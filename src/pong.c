@@ -103,8 +103,8 @@ void BallReset(Ball* ball)
 {
     ball->x = SCREEN_WIDTH / 2;
     ball->y = SCREEN_HEIGHT / 2;
-    ball->speedX = BALL_SPEED;
-    ball->speedY = BALL_SPEED;
+    ball->speedX = ((rand() % 2) * 2 - 1) * BALL_SPEED;
+    ball->speedY = ((rand() % 2) * 2 - 1) * BALL_SPEED;
 }
 
 void DrawGame(Paddle* player1, Paddle* player2, Ball* ball)
